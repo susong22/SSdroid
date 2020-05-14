@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/SDroidSample.iml" filepath="$PROJECT_DIR$/SDroidSample.iml" group="SDroidSample" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/SSDroid.iml" filepath="$PROJECT_DIR$/.idea/SSDroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="SDroidSample/app" />
+      <module fileurl="file://$PROJECT_DIR$/ssdroidlib/ssdroidlib.iml" filepath="$PROJECT_DIR$/ssdroidlib/ssdroidlib.iml" group="SDroidSample/ssdroidlib" />
+    </modules>
+  </component>
+</project>

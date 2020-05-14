@@ -1,0 +1,3 @@
+rootProject.name='SDroidSample'
+include ':app'
+include ':ssdroidlib'
