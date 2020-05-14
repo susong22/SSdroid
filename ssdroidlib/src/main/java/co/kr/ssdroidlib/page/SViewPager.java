@@ -1,6 +1,7 @@
 package co.kr.ssdroidlib.page;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -11,6 +12,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
+import co.kr.ssdroidlib.comm.SParamRunnable;
 
 /**
  * Created By hhsong 2020.05.12
@@ -81,19 +84,26 @@ public class SViewPager extends ViewPager {
 //
     public void BackPage(Object Param,boolean bAnimation)
     {
-        SPagerAdapter apdater = (SPagerAdapter)this.getAdapter();
+        final SPagerAdapter apdater = (SPagerAdapter)this.getAdapter();
         if(getCurrentItem() == 0)
         {
             Log.e("JavaSong","Can not change the page, because is in zero of Page...");
             return;
         }
-        int position = getCurrentItem();
+        final int position = getCurrentItem();
         setCurrentItem(getCurrentItem() - 1,bAnimation);
-        apdater.RemoveFragment(position);
+        if(bAnimation)
+        {
+            new Handler().postDelayed(new SParamRunnable(position) {
+                @Override
+                public void run(Object Param) {
+                    apdater.RemoveFragment((int)position);
+                }
+            }, 500);
+        }
+        else
+            apdater.RemoveFragment(position);
     }
-
-
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -139,6 +149,4 @@ public class SViewPager extends ViewPager {
         }
         return true;
     }
-
-
 }
