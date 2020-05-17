@@ -12,16 +12,16 @@ import java.util.List;
  * Created By hhsong 2020.05.12
  */
 public class SUtils {
-    //static private Context gContext;
-    //static public void Init(Context context)
-    //{
-    //    SUtils.gContext = context;
-    //}
-
-    //static public Context getContext()
-//    {
-//        return SUtils.gContext;
-//    }
+    public static long gNewID = 0;
+    public static long NewID()
+    {
+        if(gNewID == 0) {
+            gNewID = (new Date()).getTime();
+            return gNewID;
+        }
+        gNewID++;
+        return gNewID;
+    }
 
     /**
      * Get SDCard Path

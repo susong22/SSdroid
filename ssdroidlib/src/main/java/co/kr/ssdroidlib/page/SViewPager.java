@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import co.kr.ssdroidlib.comm.SParamRunnable;
@@ -28,7 +27,6 @@ public class SViewPager extends ViewPager {
     }
     private float initialXValue;
     private SwipeDirection direction;
-
 
     public SViewPager(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -51,18 +49,39 @@ public class SViewPager extends ViewPager {
         this.direction = direction;
     }
 
-
+    /**
+     * You need to set the first fragment.
+     * @param activity
+     * @param newPage
+     * @param Param
+     */
     public void StartPage(FragmentActivity activity, Fragment newPage, Object Param)
     {
         SPagerAdapter adapter = new SPagerAdapter(activity.getSupportFragmentManager());
-        adapter.AddFragment(newPage);
+        adapter.AddFragment(newPage,Param);
         setAdapter(adapter);
     }
 
-    public void NextPage(Fragment newPage, Object Param, boolean bAnimation)
+    /**
+     * Get the current parameter.
+     * @return
+     */
+    public Object GetCurrentParam()
     {
         SPagerAdapter apdater = (SPagerAdapter)this.getAdapter();
-        apdater.AddFragment(newPage);
+        return apdater.GetAt(getCurrentItem()).param;
+    }
+
+    /**
+     * Move page without ID
+     * @param newPage
+     * @param Param
+     * @param bAnimation
+     */
+    public void goPage(Fragment newPage, Object Param, boolean bAnimation)
+    {
+        SPagerAdapter apdater = (SPagerAdapter)this.getAdapter();
+        apdater.AddFragment(newPage,Param);
         if(apdater.getCount() - 1 == getCurrentItem())
         {
             Log.e("JavaSong","Can not change the page, because is in Last of Page...");
@@ -71,18 +90,42 @@ public class SViewPager extends ViewPager {
         setCurrentItem(getCurrentItem() + 1,bAnimation);
     }
 
-    //    public void NextPage(Object Param,boolean bAnimation)
-//    {
-//        PagerAdapter apdater = this.getAdapter();
-//        if(apdater.getCount() - 1 == getCurrentItem())
-//        {
-//            Log.e("JavaSong","Can not change the page, because is in Last of Page...");
-//            return;
-//        }
-//        setCurrentItem(getCurrentItem() + 1,bAnimation);
-//    }
-//
+    /**
+     * Move page
+     * @param ID
+     * @param newPage
+     * @param Param
+     * @param bAnimation
+     */
+    public void goPage(String ID,Fragment newPage, Object Param, boolean bAnimation)
+    {
+        SPagerAdapter apdater = (SPagerAdapter)this.getAdapter();
+        apdater.AddFragment(ID,newPage,Param);
+        if(apdater.getCount() - 1 == getCurrentItem())
+        {
+            Log.e("JavaSong","Can not change the page, because is in Last of Page...");
+            return;
+        }
+        setCurrentItem(getCurrentItem() + 1,bAnimation);
+    }
+
+    /**
+     * Go to the previous page
+     * @param Param
+     * @param bAnimation
+     */
     public void BackPage(Object Param,boolean bAnimation)
+    {
+        BackPage(null,Param,bAnimation);
+    }
+
+    /**
+     * Go to the ID page.
+     * @param ID
+     * @param Param
+     * @param bAnimation
+     */
+    public void BackPage(String ID,Object Param,boolean bAnimation)
     {
         final SPagerAdapter apdater = (SPagerAdapter)this.getAdapter();
         if(getCurrentItem() == 0)
@@ -90,19 +133,44 @@ public class SViewPager extends ViewPager {
             Log.e("JavaSong","Can not change the page, because is in zero of Page...");
             return;
         }
+
         final int position = getCurrentItem();
-        setCurrentItem(getCurrentItem() - 1,bAnimation);
-        if(bAnimation)
-        {
-            new Handler().postDelayed(new SParamRunnable(position) {
-                @Override
-                public void run(Object Param) {
-                    apdater.RemoveFragment((int)position);
-                }
-            }, 500);
+        if(ID == null) {
+            int backposition = getCurrentItem() - 1;
+            setCurrentItem(backposition, bAnimation);
+            if(apdater.GetAt(backposition).fragment instanceof ISFragment)
+                ((ISFragment)apdater.GetAt(backposition).fragment).OnBackActive(Param);
+            if (bAnimation) {
+                new Handler().postDelayed(new SParamRunnable(position) {
+                    @Override
+                    public void run(Object Param) {
+                        apdater.RemoveFragment((int) Param);
+                    }
+                }, 500);
+            } else
+                apdater.RemoveFragment(position);
         }
         else
-            apdater.RemoveFragment(position);
+        {
+            int backposition = apdater.FindPostion(ID);
+            if(backposition == -1)
+            {
+                Log.e("JavaSong","Can not change the page, because is not found id..."+ID);
+                return;
+            }
+            setCurrentItem(backposition, bAnimation);
+            if(apdater.GetAt(backposition).fragment instanceof ISFragment)
+                ((ISFragment)apdater.GetAt(backposition).fragment).OnBackActive(Param);
+            if (bAnimation) {
+                new Handler().postDelayed(new SParamRunnable(backposition) {
+                    @Override
+                    public void run(Object Param) {
+                        apdater.RemoveFragment((int) Param);
+                    }
+                }, 500);
+            } else
+                apdater.RemoveFragmentFrom(backposition);
+        }
     }
 
     @Override

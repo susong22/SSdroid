@@ -9,12 +9,10 @@ public class SParamRunnable implements Runnable {
     {
         mParam = Param;
     }
-
     @Override
     public void run() {
         run(mParam);
     }
-
     public void run(Object Param)
     {
     }
