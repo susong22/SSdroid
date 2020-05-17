@@ -47,8 +47,7 @@ public class SPagerAdapter extends FragmentStatePagerAdapter {
 
     public void AddFragment(Fragment frg)
     {
-        AddFragment(String.format("%d",SUtils.NewID()),frg,null);
-        notifyDataSetChanged();
+        AddFragment(frg,null);
     }
 
     public void AddFragment(Fragment frg,Object Param)
@@ -80,6 +79,7 @@ public class SPagerAdapter extends FragmentStatePagerAdapter {
     {
         return mList.get(position);
     }
+
     public void AddFragment(String ID,Fragment frg,Object Param)
     {
         SPagerAdapterData data = new SPagerAdapterData();

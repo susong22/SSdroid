@@ -57,8 +57,13 @@ public class SViewPager extends ViewPager {
      */
     public void StartPage(FragmentActivity activity, Fragment newPage, Object Param)
     {
+        StartPage(activity,null,newPage,Param);
+    }
+
+    public void StartPage(FragmentActivity activity,String ID, Fragment newPage, Object Param)
+    {
         SPagerAdapter adapter = new SPagerAdapter(activity.getSupportFragmentManager());
-        adapter.AddFragment(newPage,Param);
+        adapter.AddFragment(ID,newPage,Param);
         setAdapter(adapter);
     }
 
