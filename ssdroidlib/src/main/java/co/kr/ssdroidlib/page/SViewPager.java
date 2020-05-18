@@ -124,6 +124,12 @@ public class SViewPager extends ViewPager {
         BackPage(null,Param,bAnimation);
     }
 
+    public boolean HasBackPage() {
+        SPagerAdapter apdater = (SPagerAdapter)this.getAdapter();
+        if(apdater.getCount() > 1) return true;
+        return false;
+    }
+
     /**
      * Go to the ID page.
      * @param ID
