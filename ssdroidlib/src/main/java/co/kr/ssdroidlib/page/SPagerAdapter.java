@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 
@@ -16,17 +17,13 @@ import co.kr.ssdroidlib.comm.SUtils;
  * Created By hhsong 2020.05.12
  */
 public class SPagerAdapter extends FragmentStatePagerAdapter {
-
-
     public  class  SPagerAdapterData
     {
         public Fragment fragment;
         public String   id;
         public Object   param;
     }
-
     private ArrayList<SPagerAdapterData> mList = new ArrayList<SPagerAdapterData>();
-
     public SPagerAdapter(@NonNull FragmentManager fm, int behavior) {
         super(fm, behavior);
     }
@@ -53,7 +50,6 @@ public class SPagerAdapter extends FragmentStatePagerAdapter {
     public void AddFragment(Fragment frg,Object Param)
     {
         AddFragment(String.format("%d",SUtils.NewID()), frg, Param);
-        //notifyDataSetChanged();
     }
     public void AddFragment(String ID,Fragment frg,Object Param)
     {
@@ -89,12 +85,10 @@ public class SPagerAdapter extends FragmentStatePagerAdapter {
         return mList.get(position);
     }
 
-
-
     public void RemoveFragment(int position)
     {
         mList.remove(position);
-        //notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     public void RemoveFragmentFrom(int toposition)
@@ -103,13 +97,17 @@ public class SPagerAdapter extends FragmentStatePagerAdapter {
         {
             mList.remove(i);
         }
-        //notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     // This is called when notifyDataSetChanged() is called (Remove 이 적용되려면 이런 문구가 되어야 한다.)
     @Override
     public int getItemPosition(Object object) {
-        // refresh all fragments when data set changed
+        int nCnt = mList.size();
+        for(int i = 0; i < nCnt; i++)
+        {
+            if(mList.get(i).fragment == object) return i;
+        }
         return PagerAdapter.POSITION_NONE;
     }
 }

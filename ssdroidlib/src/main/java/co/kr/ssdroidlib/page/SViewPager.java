@@ -40,7 +40,7 @@ public class SViewPager extends ViewPager {
 
     public void Settings()
     {
-        setOffscreenPageLimit(0);
+        setOffscreenPageLimit(99999);
         setAllowedSwipeDirection(SViewPager.SwipeDirection.left);
     }
 
@@ -189,7 +189,6 @@ public class SViewPager extends ViewPager {
         if (this.IsSwipeAllowed(event)) {
             return super.onTouchEvent(event);
         }
-
         return false;
     }
 
@@ -198,7 +197,6 @@ public class SViewPager extends ViewPager {
         if (this.IsSwipeAllowed(event)) {
             return super.onInterceptTouchEvent(event);
         }
-
         return false;
     }
 

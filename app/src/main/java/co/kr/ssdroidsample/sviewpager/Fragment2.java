@@ -14,11 +14,7 @@ import co.kr.ssdroidlib.page.SViewPager;
 import co.kr.ssdroidsample.R;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link Fragment2#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class Fragment2 extends Fragment {
 
     public Fragment2() {
@@ -45,6 +41,14 @@ public class Fragment2 extends Fragment {
             @Override
             public void onClick(View v) {
                 viewPager.goPage(new Fragment3(),null,true);
+            }
+        });
+
+        button = view.findViewById(R.id.btnBack2);
+        button.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.BackPage("Fragment2에서 파라미터를 넣어줌",true);
             }
         });
         return view;

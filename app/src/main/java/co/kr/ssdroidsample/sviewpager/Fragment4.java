@@ -38,7 +38,7 @@ public class Fragment4 extends Fragment {
         button.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewPager.BackPage("Main",null, true);
+                viewPager.BackPage("Main","Fragment4에서 파라미터를 넣어줌", true);
             }
         });
         return view;

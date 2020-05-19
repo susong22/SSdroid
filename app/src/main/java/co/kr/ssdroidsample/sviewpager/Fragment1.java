@@ -1,5 +1,6 @@
 package co.kr.ssdroidsample.sviewpager;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -22,6 +23,8 @@ import android.widget.TextView;
  * create an instance of this fragment.
  */
 public class Fragment1 extends Fragment implements ISFragment {
+
+    TextView mtxtView;
     public Fragment1() {
     }
 
@@ -36,17 +39,30 @@ public class Fragment1 extends Fragment implements ISFragment {
 
         Log.d("JavaSong","1 - onCreateView");
         final  SViewPager viewPager = (SViewPager)container;
-        Object Param = viewPager.GetCurrentParam();
+
 
         View view =  inflater.inflate(R.layout.fragment_1, container, false);
-        final TextView bb = view.findViewById(R.id.txtView);
+        mtxtView = view.findViewById(R.id.txtView);
+
+
+        //파라미터를 받는 샘플이다...
+        Object Param = viewPager.GetCurrentParam();
+        mtxtView.setText((String)Param);
 
         Button button = view.findViewById(R.id.btnNext);
         button.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bb.setText("dkdkdkd");
                 viewPager.goPage(new Fragment2(),null,true);
+            }
+        });
+
+        final Activity Main = this.getActivity();
+        button = view.findViewById(R.id.btnBack1);
+        button.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Main.finish();;
             }
         });
         return  view;
@@ -55,7 +71,7 @@ public class Fragment1 extends Fragment implements ISFragment {
 
     @Override
     public void OnBackActive(Object Param) {
-
+        if(Param != null) mtxtView.setText((String)Param);
     }
 
 
