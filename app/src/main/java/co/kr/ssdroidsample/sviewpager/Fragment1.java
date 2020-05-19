@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 
 /**
@@ -38,11 +39,14 @@ public class Fragment1 extends Fragment implements ISFragment {
         Object Param = viewPager.GetCurrentParam();
 
         View view =  inflater.inflate(R.layout.fragment_1, container, false);
+        final TextView bb = view.findViewById(R.id.txtView);
+
         Button button = view.findViewById(R.id.btnNext);
         button.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewPager.goPage(new Fragment4(),null,true);
+                bb.setText("dkdkdkd");
+                viewPager.goPage(new Fragment2(),null,true);
             }
         });
         return  view;
@@ -52,5 +56,12 @@ public class Fragment1 extends Fragment implements ISFragment {
     @Override
     public void OnBackActive(Object Param) {
 
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        Log.d("JavaSong","Delete - Fragment1");
+        super.onDestroyView();
     }
 }

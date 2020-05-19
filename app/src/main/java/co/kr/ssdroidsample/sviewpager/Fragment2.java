@@ -8,6 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+
+import co.kr.ssdroidlib.page.SViewPager;
 import co.kr.ssdroidsample.R;
 
 
@@ -34,6 +37,22 @@ public class Fragment2 extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         Log.d("JavaSong","2 - onCreateView");
-        return inflater.inflate(R.layout.fragment_2, container, false);
+        final SViewPager viewPager = (SViewPager)container;
+
+        View view =  inflater.inflate(R.layout.fragment_2, container, false);
+        Button button = view.findViewById(R.id.btnNext2);
+        button.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.goPage(new Fragment3(),null,true);
+            }
+        });
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d("JavaSong","Delete - Fragment2");
+        super.onDestroyView();
     }
 }

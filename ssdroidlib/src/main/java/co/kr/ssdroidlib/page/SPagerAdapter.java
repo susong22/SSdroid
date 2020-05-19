@@ -53,6 +53,15 @@ public class SPagerAdapter extends FragmentStatePagerAdapter {
     public void AddFragment(Fragment frg,Object Param)
     {
         AddFragment(String.format("%d",SUtils.NewID()), frg, Param);
+        //notifyDataSetChanged();
+    }
+    public void AddFragment(String ID,Fragment frg,Object Param)
+    {
+        SPagerAdapterData data = new SPagerAdapterData();
+        data.id = ID;
+        data.param = Param;
+        data.fragment = frg;
+        mList.add(data);
         notifyDataSetChanged();
     }
 
@@ -80,20 +89,12 @@ public class SPagerAdapter extends FragmentStatePagerAdapter {
         return mList.get(position);
     }
 
-    public void AddFragment(String ID,Fragment frg,Object Param)
-    {
-        SPagerAdapterData data = new SPagerAdapterData();
-        data.id = ID;
-        data.param = Param;
-        data.fragment = frg;
-        mList.add(data);
-        notifyDataSetChanged();
-    }
+
 
     public void RemoveFragment(int position)
     {
         mList.remove(position);
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
     public void RemoveFragmentFrom(int toposition)
@@ -102,7 +103,7 @@ public class SPagerAdapter extends FragmentStatePagerAdapter {
         {
             mList.remove(i);
         }
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
     // This is called when notifyDataSetChanged() is called (Remove 이 적용되려면 이런 문구가 되어야 한다.)

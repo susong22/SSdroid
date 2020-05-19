@@ -176,7 +176,7 @@ public class SViewPager extends ViewPager {
                 new Handler().postDelayed(new SParamRunnable(backposition) {
                     @Override
                     public void run(Object Param) {
-                        apdater.RemoveFragment((int) Param);
+                        apdater.RemoveFragmentFrom((int) Param);
                     }
                 }, 500);
             } else

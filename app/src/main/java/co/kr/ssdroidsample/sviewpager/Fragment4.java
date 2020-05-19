@@ -13,11 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link Fragment4#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class Fragment4 extends Fragment {
 
     public Fragment4() {
@@ -33,17 +29,16 @@ public class Fragment4 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         Log.d("JavaSong","4 - onCreateView");
-
         final SViewPager viewPager = (SViewPager)container;
 
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_4, container, false);
-        Button btn = view.findViewById(R.id.btnBack);
-        btn.setOnClickListener(new View.OnClickListener() {
+        View view =  inflater.inflate(R.layout.fragment_4, container, false);
+        Button button = view.findViewById(R.id.btnBackHome);
+        button.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewPager.BackPage(null,true);
+                viewPager.BackPage("Main",null, true);
             }
         });
         return view;
