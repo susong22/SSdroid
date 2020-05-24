@@ -1,13 +1,17 @@
 package co.kr.ssdroidsample;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import co.kr.ssdroidlib.page.SViewPager;
 import co.kr.ssdroidsample.R;
 import co.kr.ssdroidsample.sviewpager.SViewPagerActivity;
 import co.kr.ssdroidsample.swebview.SWebViewActivity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,8 +56,31 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = this;
+        checkPermission();
         AddData();
         SetListView();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        try
+        {
+            switch (requestCode) {
+                case MY_PERMISSION:
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        Log.d("JavaSongs", "onRequestPermissionsResult  GPS Permission");
+                    }
+                    else
+                    {
+                        Log.d("JavaSongs", "onRequestPermissionsResult GPS Permission always deny");
+                    }
+                    break;
+            }
+        }
+        catch(Exception e)
+        {
+            Log.e("JavaSongs", "onRequestPermissionsResult " + e.getLocalizedMessage());
+        }
     }
 
     void SetListView()
@@ -93,5 +120,31 @@ public class MainActivity extends AppCompatActivity {
                 return view;
             }
         });
+    }
+
+    static final int MY_PERMISSION = 101;
+    private boolean checkPermission() {
+        try
+        {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            {
+                //Location 정보를 추가한다.
+                ActivityCompat.requestPermissions(this,new String[]{
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+//								,Manifest.permission.BROADCAST_SMS
+//								,Manifest.permission.BROADCAST_WAP_PUSH
+                        },
+                        MY_PERMISSION);
+
+            }
+            else return  true;
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            Log.e("JavaSongs",e.getLocalizedMessage());
+        }
+        return false;
     }
 }
