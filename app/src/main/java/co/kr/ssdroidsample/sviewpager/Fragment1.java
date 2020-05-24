@@ -53,7 +53,7 @@ public class Fragment1 extends Fragment implements ISFragment {
         button.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewPager.goPage(new Fragment2(),null,true);
+                viewPager.goPage("frg2",new Fragment2(),null,true);
             }
         });
 

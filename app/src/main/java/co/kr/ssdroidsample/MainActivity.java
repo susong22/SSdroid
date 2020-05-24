@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import co.kr.ssdroidlib.page.SViewPager;
 import co.kr.ssdroidsample.R;
 import co.kr.ssdroidsample.sviewpager.SViewPagerActivity;
+import co.kr.ssdroidsample.swebview.SWebViewActivity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +26,8 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    static int ID_ViewPager = 1;
+    static final int ID_ViewPager = 1;
+    static final int ID_WebView = 2;
 
     static  public class SampleData
     {
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     public void AddData()
     {
         mLstSampleData.add(new SampleData(ID_ViewPager,"SViewPager","This is a sample to switch page."));
+        mLstSampleData.add(new SampleData(ID_WebView,"SWebView","웹뷰 샘플입니다."));
     }
 
 
@@ -58,11 +61,16 @@ public class MainActivity extends AppCompatActivity {
         ListView view = findViewById(R.id.lstSample);
         view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                SampleData data = mLstSampleData.get(i);
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                SampleData data = mLstSampleData.get(position);
                 if(data.ID == ID_ViewPager)
                 {
                     Intent intent = new Intent(MainActivity.this, SViewPagerActivity.class);
+                    startActivity(intent);
+                }
+                else if(data.ID == ID_WebView)
+                {
+                    Intent intent = new Intent(MainActivity.this, SWebViewActivity.class);
                     startActivity(intent);
                 }
             }
