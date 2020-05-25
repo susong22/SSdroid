@@ -9,30 +9,33 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import co.kr.ssdroidlib.webview.SMultiWebView;
 import co.kr.ssdroidlib.webview.SWebView;
 import co.kr.ssdroidsample.R;
 
 public class SWebViewActivity extends AppCompatActivity {
-    SWebView mWebView;
+    SMultiWebView mWebView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swebview);
         setTitle("SWebView");
 
-        mWebView = (SWebView)findViewById(R.id.webview);
-        mWebView.SetWebSettings(this);
+        //mWebView = (SWebView)findViewById(R.id.webview);
+        //mWebView.SetWebSettings(this);
 
-        mWebView.loadUrl("http://58.181.28.39:8080/SimpTLSvc/WSClient.html");
+        //mWebView.loadUrl("http://58.181.28.39:8080/SimpTLSvc/WSClient.html");
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mWebView.onActivityResult(requestCode,resultCode,data); //파일 업로드시에 사용한다.
+        //mWebView.onActivityResult(requestCode,resultCode,data); //파일 업로드시에 사용한다.
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        /*
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_BACK: {
@@ -41,7 +44,7 @@ public class SWebViewActivity extends AppCompatActivity {
                     return false;
                 }
             }
-        }
+        }*/
         return super.onKeyDown(keyCode, event);
     }
 

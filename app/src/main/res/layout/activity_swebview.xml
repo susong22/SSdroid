@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".swebview.SWebViewActivity">
 
-    <co.kr.ssdroidlib.webview.SWebView
+    <co.kr.ssdroidlib.webview.SMultiWebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
