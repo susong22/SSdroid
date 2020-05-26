@@ -8,4 +8,9 @@ public interface ISWebView {
     public void onReceivedError(WebView view, int errorcode, String description, String fallingUrl);
     public void onPageStarted(WebView view, String url, Bitmap favicon);
     public void onPageFinished(WebView view, String Url);
+
+    //Javascript Handler
+    public void postMessage(WebView view, String data);
+    public void toastLong (WebView view, String message);
+    public void toastShort (WebView view, String message);
 }

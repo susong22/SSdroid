@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -18,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -34,14 +36,20 @@ import java.util.Date;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.DOWNLOAD_SERVICE;
 
 public class SWebView extends WebView {
 
+
     protected ISWebView mInterface;
-    protected Activity mActivity;
+    protected Context mContext;
     protected ProgressBar mProgressBar;
+    protected long mID;
+    protected SMultiWebView mMultiWebView;
     // -------------------------------------------------------------------------------
     // 파일 업로드..
     // -------------------------------------------------------------------------------
@@ -53,15 +61,29 @@ public class SWebView extends WebView {
     public static String mCameraPhotoPath;
     // -------------------------------------------------------------------------------
 
+    public SWebView(Context context) {
+        super(context);
+        mContext = context;
+
+    }
+
     public SWebView(Context context, AttributeSet attrs) {
         super(context,attrs);
+        mContext = context;
 
     }
     public SWebView(Context context, AttributeSet attrs, int defStyle) {
         super(context,attrs,defStyle);
+        mContext = context;
     }
 
+    public void SetMultiWebView(SMultiWebView v) { mMultiWebView = v;}
 
+    public long GetID() { return mID;}
+    public void SetID(long v) { mID = v;}
+    public ISWebView GetInterface() {
+        return mInterface;
+    }
     public void SetInterface(ISWebView Inter) {
         mInterface = Inter;
     }
@@ -76,23 +98,6 @@ public class SWebView extends WebView {
         } else {
             loadUrl(sInJSFunction);
         }
-    }
-
-    public String getCookie(String siteName,String CookieName){
-        String CookieValue = null;
-
-        CookieManager cookieManager = CookieManager.getInstance();
-        String cookies = cookieManager.getCookie(siteName);
-        if(cookies != null){
-            String[] temp=cookies.split(";");
-            for (String ar1 : temp ){
-                if(ar1.contains(CookieName)){
-                    String[] temp1=ar1.split("=");
-                    CookieValue = temp1[1];
-                }
-            }
-        }
-        return CookieValue;
     }
 
 
@@ -132,13 +137,12 @@ public class SWebView extends WebView {
     }
 
     @SuppressLint("JavascriptInterface")
-    public void SetWebSettings(Activity activity) {
-
-        mActivity = activity;
-        // window.ssdroid.postMessage(xxx) 이렇게 자바스크립트를 콜하여 이벤트를 발생시켜준다.
-        addJavascriptInterface(mActivity,"ssdroid");
+    public void SetWebSettings() {
 
         getSettings().setJavaScriptEnabled(true);
+
+        // window.ssdroid.postMessage(xxx) 이렇게 자바스크립트를 콜하여 이벤트를 발생시켜준다.
+        addJavascriptInterface(new JavascriptInterface(this),"ssdroid");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getSettings().setSafeBrowsingEnabled(false);
@@ -172,11 +176,17 @@ public class SWebView extends WebView {
         getSettings().setLoadWithOverviewMode(true);
 
         getSettings().setGeolocationEnabled(true);
-        getSettings().setGeolocationDatabasePath(mActivity.getFilesDir().getPath());
+        getSettings().setGeolocationDatabasePath(((Activity)mContext).getFilesDir().getPath());
 
         getSettings().setDatabaseEnabled(true);
 //		getSettings().setDomStorageEnabled(true);
         getSettings().setAppCacheEnabled(true);
+
+
+        //window.open
+        getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        getSettings().setSupportMultipleWindows(true);
+
 
         //파일 다운로드 관련한 설정을 추가하였다. (파일다운로드 지원)
         setDownloadListener(new DownloadListenerEx());
@@ -199,7 +209,7 @@ public class SWebView extends WebView {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 filePath = data.getDataString();
             } else {
-                filePath = "file:" + RealPathUtil.getRealPath(mActivity, data.getData());
+                filePath = "file:" + RealPathUtil.getRealPath(((Activity)mContext), data.getData());
             }
             result = Uri.parse(filePath);
         }
@@ -208,6 +218,7 @@ public class SWebView extends WebView {
 
     class WebViewClientEx extends  WebViewClient
     {
+
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String Url) {
             if(mInterface != null) return mInterface.shouldOverrideUrlLoading(view,Url);
@@ -231,6 +242,12 @@ public class SWebView extends WebView {
         public void onPageFinished(WebView view, String Url) {
             if(mProgressBar != null) mProgressBar.setVisibility(View.INVISIBLE);
             if(mInterface != null) mInterface.onPageFinished(view,Url);
+
+            SWebView sWebView = (SWebView)view;
+            if(mMultiWebView != null) {
+                if(view.getTitle().length() > 0)
+                    mMultiWebView.mTabBar.SetTitle(sWebView.GetID(), view.getTitle());
+            }
         }
 
     }
@@ -242,6 +259,21 @@ public class SWebView extends WebView {
             callback.invoke(origin, true, false);
         }
 
+        @Override
+        public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+            if(mMultiWebView != null) {
+                WebView newWebView = mMultiWebView.AddWebView("NoTitle", true);
+                ((WebView.WebViewTransport) resultMsg.obj).setWebView(newWebView);
+                resultMsg.sendToTarget();
+            }
+            return true;
+        }
+
+        @Override public void onCloseWindow(WebView webView)
+        {
+            if(mMultiWebView != null)
+                mMultiWebView.RemoveWebView(mMultiWebView.FindViewID(webView));
+        }
 
         @Override
         public boolean onJsAlert(WebView view, String url, String message,
@@ -261,7 +293,7 @@ public class SWebView extends WebView {
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             //intent.setType(TYPE_IMAGE);
             intent.setType(TYPE_ALL);
-            mActivity.startActivityForResult(intent,
+            ((Activity)mContext).startActivityForResult(intent,
                     INPUT_FILE_REQUEST_CODE);
         }
 
@@ -302,7 +334,7 @@ public class SWebView extends WebView {
 
             Intent takePictureIntent = new Intent(
                     MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(mActivity.getPackageManager()) != null) {
+            if (takePictureIntent.resolveActivity(((Activity)mContext).getPackageManager()) != null) {
                 // Create the File where the photo should go
                 File photoFile = null;
                 try {
@@ -346,7 +378,7 @@ public class SWebView extends WebView {
             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
                     intentArray);
 
-            mActivity.startActivityForResult(
+            ((Activity)mContext).startActivityForResult(
                     chooserIntent, INPUT_FILE_REQUEST_CODE);
         }
 
@@ -369,7 +401,7 @@ public class SWebView extends WebView {
 
             Intent chooserIntent;
 
-            if (mActivity.getPackageManager().resolveActivity(sIntent, 0) != null){
+            if (((Activity)mContext).getPackageManager().resolveActivity(sIntent, 0) != null){
                 // it is device with samsung file manager
                 chooserIntent = Intent.createChooser(sIntent, "Open file");
                 chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] { intent});
@@ -379,7 +411,7 @@ public class SWebView extends WebView {
             }
 
             try {
-                mActivity.startActivityForResult(chooserIntent, INPUT_FILE_REQUEST_CODE);
+                ((Activity)mContext).startActivityForResult(chooserIntent, INPUT_FILE_REQUEST_CODE);
             } catch (android.content.ActivityNotFoundException ex) {
 
             }
@@ -422,28 +454,43 @@ public class SWebView extends WebView {
                 request.allowScanningByMediaScanner();
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-                DownloadManager dm = (DownloadManager) mActivity.getSystemService(DOWNLOAD_SERVICE);
+                DownloadManager dm = (DownloadManager) ((Activity)mContext).getSystemService(DOWNLOAD_SERVICE);
                 dm.enqueue(request);
-                Toast.makeText(mActivity.getApplicationContext(), "Downloading File", Toast.LENGTH_LONG).show();
+                Toast.makeText(((Activity)mContext).getApplicationContext(), "Downloading File", Toast.LENGTH_LONG).show();
             } catch (Exception e) {
 
-                if (ContextCompat.checkSelfPermission(mActivity,
+                if (ContextCompat.checkSelfPermission(((Activity)mContext),
                         android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
                     // Should we show an explanation?
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(mActivity,
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(((Activity)mContext),
                             android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                        Toast.makeText(mActivity.getBaseContext(), "첨부파일 다운로드를 위해\n동의가 필요합니다.", Toast.LENGTH_LONG).show();
-                        ActivityCompat.requestPermissions(mActivity, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        Toast.makeText(((Activity)mContext).getBaseContext(), "첨부파일 다운로드를 위해\n동의가 필요합니다.", Toast.LENGTH_LONG).show();
+                        ActivityCompat.requestPermissions(((Activity)mContext), new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                 110);
                     } else {
-                        Toast.makeText(mActivity.getBaseContext(), "첨부파일 다운로드를 위해\n동의가 필요합니다.", Toast.LENGTH_LONG).show();
-                        ActivityCompat.requestPermissions(mActivity, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        Toast.makeText(((Activity)mContext).getBaseContext(), "첨부파일 다운로드를 위해\n동의가 필요합니다.", Toast.LENGTH_LONG).show();
+                        ActivityCompat.requestPermissions(((Activity)mContext), new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                 110);
                     }
                 }
             }
         }
+    }
+
+    class JavascriptInterface {
+        SWebView mWebView;
+        public JavascriptInterface(SWebView WebView) {
+            mWebView = WebView;
+        }
+        //window.ssdroid.toastLong( "JavscriptInterface Test" );
+        @android.webkit.JavascriptInterface
+        public void toastLong(String data) { if(mWebView.mInterface != null) mWebView.mInterface.toastLong(mWebView,data); }
+        @android.webkit.JavascriptInterface
+        public void toastShort(String data) { if(mWebView.mInterface != null) mWebView.mInterface.toastShort(mWebView,data); }
+        @android.webkit.JavascriptInterface
+        public void postMessage(String data) { if(mWebView.mInterface != null) mWebView.mInterface.postMessage(mWebView,data); }
+
     }
 
 }

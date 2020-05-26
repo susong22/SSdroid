@@ -1,24 +1,25 @@
 package co.kr.ssdroidlib.webview;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
+import android.content.Intent;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import androidx.annotation.Nullable;
-import org.w3c.dom.Text;
-import co.kr.sdroidlib.R;
 
-public class SMultiWebView extends LinearLayout {
+import androidx.annotation.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import co.kr.ssdroidlib.comm.SUtils;
+
+public class SMultiWebView extends LinearLayout implements SMultiWebViewTabBar.SMultiWebViewTabBarEvent {
     Context mContext;
-    HorizontalScrollView  mTabBar;
+    SMultiWebViewTabBar  mTabBar;
     LinearLayout          mTabBarContent;
+    ISWebView mInterface;
+    Map<Long,SWebView> mapData = new HashMap<Long,SWebView>();
 
     public SMultiWebView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -28,46 +29,202 @@ public class SMultiWebView extends LinearLayout {
     void Init(Context context)
     {
         mContext = context;
-        this.setOrientation(LinearLayout.VERTICAL);
+        setOrientation(LinearLayout.VERTICAL);
 
-        mTabBar = new HorizontalScrollView(context);
-        HorizontalScrollView.LayoutParams TabBarParam = new HorizontalScrollView.LayoutParams(HorizontalScrollView.LayoutParams.MATCH_PARENT, ToDiplay(30));
-        mTabBar.setLayoutParams(TabBarParam);
-
-        mTabBarContent = new LinearLayout(context);
-        LinearLayout.LayoutParams pl = new LinearLayout.LayoutParams(ToDiplay(0), LayoutParams.MATCH_PARENT);
-        mTabBarContent.setLayoutParams(pl);
-        mTabBarContent.setOrientation(LinearLayout.HORIZONTAL);
-        mTabBarContent.setBackgroundColor(Color.WHITE);
-        mTabBar.addView(mTabBarContent);
-
+        mTabBar = new SMultiWebViewTabBar(context);
+        mTabBar.setVisibility(View.GONE);
+        mTabBar.SetEvent(this);
         addView(mTabBar);
-
-        //mTabBar.setBackgroundColor(Color.RED);
-        AddTab("울랄라");
-        AddTab("울랄라 s asadkfasd");
+        AddWebView("Main",false);
     }
 
-    void AddTab(String sTitle)
+    public void SetInterface(ISWebView Inter) {
+        mInterface = Inter;
+        for(Map.Entry<Long, SWebView> entry : mapData.entrySet()) {
+            SWebView value = entry.getValue();
+            if(value.GetInterface() != mInterface)
+                value.SetInterface(Inter);
+        }
+    }
+
+    public SWebView FindViewWebView(long id) {
+        return mapData.get(id);
+    }
+
+    public long FindViewID(View view) {
+        for(Map.Entry<Long, SWebView> entry : mapData.entrySet()) {
+            SWebView value = entry.getValue();
+            if(value == view)
+                return entry.getKey();
+        }
+        return 0;
+    }
+
+    public SWebView GetFocusWebView()
     {
-
-        TextView textView = new TextView(mContext);
-        textView.setText(sTitle);
-        textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        textView.setBackgroundColor(Color.DKGRAY);
-        textView.setTextColor(Color.WHITE);
-        //textView.setBackgroundResource(android.R.drawable.ic_menu_close_clear_cancel);
-
-        textView.setSingleLine();
-        textView.setPadding(ToDiplay(4),0,ToDiplay(4),0);
-
-        textView.setTextSize(18);
-        textView.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams TxtParams = new LinearLayout.LayoutParams(ToDiplay(100),ViewGroup.LayoutParams.MATCH_PARENT);
-        TxtParams.setMargins(ToDiplay(2),0,0,0);
-        textView.setLayoutParams(TxtParams);
-        mTabBarContent.addView(textView);
+        long id = GetFocus();
+        return mapData.get(id);
     }
 
-    int ToDiplay(int n) { return (int)(n* mContext.getResources().getDisplayMetrics().density);}
+    public void SetFocus(long ID)
+    {
+        for(Map.Entry<Long, SWebView> entry : mapData.entrySet()) {
+            SWebView value = entry.getValue();
+            if(entry.getKey() == ID) {
+                mTabBar.SetFocus(ID);
+                value.setVisibility(View.VISIBLE);
+            }
+            else {
+                if(value.getVisibility() != View.GONE)
+                    value.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    public long GetFocus()
+    {
+        return mTabBar.GetFocus();
+    }
+
+    public void loadUrl(String url, Map<String, String> additionalHttpHeaders) {
+        long id = GetFocus();
+        SWebView webview = mapData.get(id);
+        if(webview != null)
+            webview.loadUrl(url,additionalHttpHeaders);
+    }
+
+    public void loadUrl(String url) {
+        long id = GetFocus();
+        SWebView webview = mapData.get(id);
+        if(webview != null) webview.loadUrl(url);
+    }
+
+    public void postUrl(String url, byte[] postData) {
+        long id = GetFocus();
+        SWebView webview = mapData.get(id);
+        if(webview != null)
+            webview.postUrl(url,postData);
+    }
+
+
+    public void loadUrl(long id,String url, Map<String, String> additionalHttpHeaders) {
+        SWebView webview = mapData.get(id);
+        if(webview != null)
+            webview.loadUrl(url,additionalHttpHeaders);
+    }
+
+    public void loadUrl(long id,String url) {
+        SWebView webview = mapData.get(id);
+        if(webview != null)
+            webview.loadUrl(url);
+
+    }
+
+    public void postUrl(long id,String url, byte[] postData) {
+        SWebView webview = mapData.get(id);
+        if(webview != null)
+            webview.postUrl(url,postData);
+    }
+
+    public SWebView AddWebView(String sTitle,boolean bClosable)
+    {
+        long ID = SUtils.NewID();
+        mTabBar.AddTab(ID,sTitle,bClosable,true);
+        SWebView webView = new SWebView(mContext);
+        webView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        addView(webView);
+        webView.SetID(ID);
+        webView.SetMultiWebView(this);
+        webView.SetWebSettings();
+        webView.SetInterface(mInterface);
+        mapData.put(ID,webView);
+        SetFocus(ID);
+
+        if(mapData.size() > 1) mTabBar.setVisibility(VISIBLE);
+        else mTabBar.setVisibility(GONE);
+        return webView;
+    }
+
+
+    public void RemoveWebView(long ID)
+    {
+        SWebView webView = mapData.get(ID);
+        if(webView != null)
+        {
+            removeView(webView);
+            mapData.remove(ID);
+        }
+        mTabBar.RemoveTab(ID);
+
+        if(mapData.size() > 1) mTabBar.setVisibility(VISIBLE);
+        else mTabBar.setVisibility(GONE);
+    }
+    public boolean canGoBack()
+    {
+        long ID = GetFocus();
+        SWebView webView = mapData.get(ID);
+        if(webView != null)
+        {
+            return webView.canGoBack();
+        }
+        return false;
+    }
+
+    public boolean canGoForward()
+    {
+        long ID = GetFocus();
+        SWebView webView = mapData.get(ID);
+        if(webView != null)
+        {
+            return webView.canGoForward();
+        }
+        return false;
+    }
+
+    public void goBack()
+    {
+        long ID = GetFocus();
+        SWebView webView = mapData.get(ID);
+        if(webView != null)
+        {
+            webView.goBack();
+        }
+    }
+
+    public void goForward()
+    {
+        long ID = GetFocus();
+        SWebView webView = mapData.get(ID);
+        if(webView != null)
+        {
+            webView.goForward();
+        }
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        long ID = GetFocus();
+        SWebView webView = mapData.get(ID);
+        if(webView != null)
+        {
+            webView.onActivityResult(requestCode,resultCode,data);
+        }
+    }
+
+    //SMultiWebViewTabBar.SMultiWebViewTabBarEvent
+
+    @Override
+    public void OnClicked(long id) {
+        SetFocus(id);
+    }
+
+    @Override
+    public void OnRemoved(long id) {
+        //RemoveWebView(id);
+        SWebView webView = FindViewWebView(id);
+        if(webView != null)
+            webView.loadUrl("javascript:window.close();");
+    }
+
+    //End SMultiWebViewTabBar.SMultiWebViewTabBarEvent
 }

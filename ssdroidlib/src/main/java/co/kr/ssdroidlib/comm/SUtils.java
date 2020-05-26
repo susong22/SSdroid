@@ -1,6 +1,8 @@
 package co.kr.ssdroidlib.comm;
 
+import android.content.Context;
 import android.os.Environment;
+import android.webkit.CookieManager;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -22,6 +24,8 @@ public class SUtils {
         gNewID++;
         return gNewID;
     }
+
+    public static int ToDiplay(Context context,int n) { return (int)(n* context.getResources().getDisplayMetrics().density);}
 
     /**
      * Get SDCard Path
@@ -59,5 +63,21 @@ public class SUtils {
         }
 
         return sdCardFile.getAbsolutePath();
+    }
+
+    static public String getCookie(String siteName,String CookieName){
+        String CookieValue = null;
+        CookieManager cookieManager = CookieManager.getInstance();
+        String cookies = cookieManager.getCookie(siteName);
+        if(cookies != null){
+            String[] temp=cookies.split(";");
+            for (String ar1 : temp ){
+                if(ar1.contains(CookieName)){
+                    String[] temp1=ar1.split("=");
+                    CookieValue = temp1[1];
+                }
+            }
+        }
+        return CookieValue;
     }
 }
