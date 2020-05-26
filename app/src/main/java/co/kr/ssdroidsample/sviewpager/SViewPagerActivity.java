@@ -14,7 +14,9 @@ public class SViewPagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sviewpager);
         setTitle("SViewPager");
         mViewpager =  findViewById(R.id.vwPage);
-        mViewpager.StartPage(this,"Main",new Fragment1(),"시작시 파라미터를 넣어주었다.");
+
+        //This is set when using the first fragment at the start of the page.
+        mViewpager.StartPage(this,"Main",new Fragment1(),"The parameters were set at startup.");
     }
 
     @Override

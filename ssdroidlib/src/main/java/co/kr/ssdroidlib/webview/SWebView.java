@@ -43,8 +43,6 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.DOWNLOAD_SERVICE;
 
 public class SWebView extends WebView {
-
-
     protected ISWebView mInterface;
     protected Context mContext;
     protected ProgressBar mProgressBar;
@@ -91,15 +89,19 @@ public class SWebView extends WebView {
     {
         mProgressBar = bar;
     }
+
     public void ExecuteJS(String sInJSFunction)
     {
+        ExecuteJS(sInJSFunction,null);
+    }
+    public void ExecuteJS(String sInJSFunction,ValueCallback resultCall)
+    {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            evaluateJavascript(sInJSFunction.replace("javascript::",""),null);
+            evaluateJavascript(sInJSFunction.replace("javascript::",""),resultCall);
         } else {
             loadUrl(sInJSFunction);
         }
     }
-
 
     //File Upload 실행해주어야 한다.
     public void onActivityResult(int requestCode, int resultCode, Intent data)

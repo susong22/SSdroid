@@ -21,6 +21,11 @@ public class SMultiWebView extends LinearLayout implements SMultiWebViewTabBar.S
     ISWebView mInterface;
     Map<Long,SWebView> mapData = new HashMap<Long,SWebView>();
 
+    public SMultiWebView(Context context) {
+        super(context);
+        Init(context);
+    }
+
     public SMultiWebView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         Init(context);
