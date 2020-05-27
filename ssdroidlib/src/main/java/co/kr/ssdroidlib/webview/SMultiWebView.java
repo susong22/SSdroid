@@ -227,8 +227,7 @@ public class SMultiWebView extends LinearLayout implements SMultiWebViewTabBar.S
     public void OnRemoved(long id) {
         //RemoveWebView(id);
         SWebView webView = FindViewWebView(id);
-        if(webView != null)
-            webView.loadUrl("javascript:window.close();");
+        if(webView != null)  webView.loadUrl("javascript:window.close();");
     }
 
     //End SMultiWebViewTabBar.SMultiWebViewTabBarEvent

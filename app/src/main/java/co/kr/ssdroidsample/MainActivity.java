@@ -3,8 +3,11 @@ package co.kr.ssdroidsample;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import co.kr.ssdroidlib.http.SHttpRequest;
 import co.kr.ssdroidlib.page.SViewPager;
 import co.kr.ssdroidsample.R;
+import co.kr.ssdroidsample.shttp.SHttpActivity;
 import co.kr.ssdroidsample.sviewpager.SViewPagerActivity;
 import co.kr.ssdroidsample.swebview.SWebViewActivity;
 
@@ -32,13 +35,15 @@ public class MainActivity extends AppCompatActivity {
 
     static final int ID_ViewPager = 1;
     static final int ID_WebView = 2;
+    static final int ID_HttpRequest = 3;
 
     static  public class SampleData
     {
-        public  SampleData(int id,String sT,String sD) { Title = sT;Desc = sD; ID = id;}
+        public  SampleData(int id,String sT,String sD,Class<?> activity) { Title = sT;Desc = sD; ID = id;Activity = activity;}
         public int ID;
         public String Title;
         public String Desc;
+        public Class<?> Activity;
     }
 
     Context mContext;
@@ -46,8 +51,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void AddData()
     {
-        mLstSampleData.add(new SampleData(ID_ViewPager,"SViewPager","This is a sample to switch page."));
-        mLstSampleData.add(new SampleData(ID_WebView,"SWebView","웹뷰 샘플입니다."));
+        mLstSampleData.add(new SampleData(ID_ViewPager,"SViewPager","This is a sample to switch page.",SViewPagerActivity.class));
+        mLstSampleData.add(new SampleData(ID_WebView,"SWebView","This is a sample of webview page.",SWebViewActivity.class));
+        mLstSampleData.add(new SampleData(ID_HttpRequest,"SHttpRequest","This is a sample to request http.",SHttpActivity.class));
     }
 
 
@@ -90,16 +96,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 SampleData data = mLstSampleData.get(position);
-                if(data.ID == ID_ViewPager)
-                {
-                    Intent intent = new Intent(MainActivity.this, SViewPagerActivity.class);
-                    startActivity(intent);
-                }
-                else if(data.ID == ID_WebView)
-                {
-                    Intent intent = new Intent(MainActivity.this, SWebViewActivity.class);
-                    startActivity(intent);
-                }
+                Intent intent = new Intent(MainActivity.this,data.Activity);
+                startActivity(intent);
             }
         });
         view.setAdapter(new BaseAdapter() {
