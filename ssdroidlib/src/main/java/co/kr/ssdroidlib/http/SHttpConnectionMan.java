@@ -10,6 +10,14 @@ import co.kr.ssdroidlib.comm.SUtils;
 
 public class SHttpConnectionMan {
 
+    static class ThreadParam extends Thread
+    {
+        Object mObject;
+        public ThreadParam(Object object)
+        {
+            mObject = object;
+        }
+    }
     static class HttpResData {
         Thread Thread;
         SHttpConnection Request;
@@ -73,16 +81,17 @@ public class SHttpConnectionMan {
         Put(lID,newHttp);
 
         newHttp.Thread = new ThreadParam(newHttp){
+            @Override
             public void run() {
                 HttpResData newHttp = (HttpResData)mObject;
                 try {
                     File myFile = new File(newHttp.UploadFilePath);
                     long lSize = myFile.length();
-                    if(newHttp.Request.Connection() == false) return;
-                    if(newHttp.Request.HttpSetup(lSize,newHttp.Header) == false) return;
-                    if(newHttp.Request.SendFile(newHttp.UploadFilePath)) return;
-                    if(newHttp.Request.Response() != 200) return;
-                    if(newHttp.Request.Receive()) return;
+                    if(newHttp.Request.Connection() == false) { Remove(newHttp.ID);return;}
+                    if(newHttp.Request.HttpSetup(lSize,newHttp.Header) == false) { Remove(newHttp.ID);return;}
+                    if(newHttp.Request.SendFile(newHttp.UploadFilePath) == false) { Remove(newHttp.ID);return;}
+                    if(newHttp.Request.Response() != 200) { Remove(newHttp.ID);return;}
+                    if(newHttp.Request.Receive() == false) { Remove(newHttp.ID);return;}
                     Remove(newHttp.ID);
                 }
                 catch (Exception e)
@@ -95,8 +104,6 @@ public class SHttpConnectionMan {
         newHttp.Thread.start();
         return lID;
     }
-
-
 
     static void CancelRequestHttp(long id)
     {
@@ -126,15 +133,6 @@ public class SHttpConnectionMan {
         synchronized (mapData)
         {
             mapData.remove(id);
-        }
-    }
-
-    static class ThreadParam extends Thread
-    {
-        Object mObject;
-        public ThreadParam(Object object)
-        {
-            mObject = object;
         }
     }
 }
