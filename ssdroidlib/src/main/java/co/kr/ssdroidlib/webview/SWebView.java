@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -140,6 +141,11 @@ public class SWebView extends WebView {
 
     @SuppressLint("JavascriptInterface")
     public void SetWebSettings() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (0 != (mContext.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE))
+            { WebView.setWebContentsDebuggingEnabled(true); }
+        }
 
         getSettings().setJavaScriptEnabled(true);
 
