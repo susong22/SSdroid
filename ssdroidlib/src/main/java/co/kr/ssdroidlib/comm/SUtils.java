@@ -9,6 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 /**
  * Created By hhsong 2020.05.12
@@ -79,5 +81,12 @@ public class SUtils {
             }
         }
         return CookieValue;
+    }
+
+    public static long getCRC32(String input) {
+        byte[] bytes = input.getBytes();
+        Checksum checksum = new CRC32(); // java.util.zip.CRC32
+        checksum.update(bytes, 0, bytes.length);
+        return checksum.getValue();
     }
 }
