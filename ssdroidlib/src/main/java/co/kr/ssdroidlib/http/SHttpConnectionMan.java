@@ -32,14 +32,14 @@ public class SHttpConnectionMan {
         return RequestHttp(sURL,btPost,Header,RequestEvent);
     }
 
-    static public long RequestHttp(String sURL, byte[] btPost, Map<String,String> Header, IHttpConnection RequestEvent, IHttpProgress Progress)
+    static public long RequestHttp(long lID,String sURL, byte[] btPost, Map<String,String> Header, IHttpConnection RequestEvent, IHttpProgress Progress)
     {
-        long lID = SUtils.NewID();
+        if(lID == 0) lID = SUtils.NewID();
         HttpResData newHttp = new HttpResData();
         newHttp.ID = lID;
         newHttp.Post = btPost;
         newHttp.Header = Header;
-        newHttp.Request = new SHttpConnection(sURL);
+        newHttp.Request = new SHttpConnection(sURL,lID);
         newHttp.Request.SetHttpRequestEvent(RequestEvent);
         newHttp.Request.SetProgress(Progress);
         Put(lID,newHttp);
@@ -67,6 +67,11 @@ public class SHttpConnectionMan {
         return lID;
     }
 
+    static public long RequestHttp(String sURL, byte[] btPost, Map<String,String> Header, IHttpConnection RequestEvent, IHttpProgress Progress)
+    {
+        return RequestHttp(0,sURL, btPost, Header, RequestEvent, Progress);
+    }
+
 
     static public long RequestHttp(String sURL, String sUploadFilePath, Map<String,String> Header,  IHttpConnection RequestEvent, IHttpProgress Progress)
     {
@@ -75,7 +80,7 @@ public class SHttpConnectionMan {
         newHttp.ID = lID;
         newHttp.Header = Header;
         newHttp.UploadFilePath = sUploadFilePath;
-        newHttp.Request = new SHttpConnection(sURL);
+        newHttp.Request = new SHttpConnection(sURL,lID);
         newHttp.Request.SetHttpRequestEvent(RequestEvent);
         newHttp.Request.SetProgress(Progress);
         Put(lID,newHttp);

@@ -25,6 +25,7 @@ public class SHttpConnection {
     public final int Error_MalformedURLOther = -7;
     //public final int Error_Completed = -8;
 
+    protected long mID;
     protected String msURL;
     protected int mnConnectionTimeOut;
     protected int mnRcvTimeOut;
@@ -44,7 +45,7 @@ public class SHttpConnection {
     public void SetProgress(IHttpProgress Progress) { mProgress = Progress;}
 
 
-    public SHttpConnection(String sURL) { msURL = sURL;}
+    public SHttpConnection(String sURL,long id) { msURL = sURL; mID = id;}
     void Disconnection()
     {
         try
@@ -64,7 +65,7 @@ public class SHttpConnection {
         try
         {
             url = new URL(msURL);
-            if(mProgress != null) mProgress.OnTitle("Connecting...");
+            if(mProgress != null) mProgress.OnTitle(mID,"Connecting...");
             if (url.getProtocol().toLowerCase().equals("https"))
             {
                 System.setProperty("http.keepAlive", "false");
@@ -80,8 +81,8 @@ public class SHttpConnection {
         {
             SetError("Connection " + e.getLocalizedMessage());
             Log.e("JavaSong",GetError());
-            if(mProgress != null) {mProgress.OnEnd();}
-            if(mRequestEvent != null) mRequestEvent.OnConnected(Error_Connection,null,GetError());
+            if(mProgress != null) {mProgress.OnEnd(mID);}
+            if(mRequestEvent != null) mRequestEvent.OnConnected(mID,Error_Connection,null,GetError());
             return false;
         }
         return true;
@@ -91,7 +92,7 @@ public class SHttpConnection {
     {
         try {
 
-            if(mProgress != null) mProgress.OnTitle("Updating...");
+            if(mProgress != null) mProgress.OnTitle(mID,"Updating...");
 
             if (PostSize > 0) {
                 mConn.setRequestMethod("POST");
@@ -116,8 +117,8 @@ public class SHttpConnection {
         {
             SetError("HttpSetup " + e.getLocalizedMessage());
             Log.e("JavaSong",GetError());
-            if(mProgress != null) {mProgress.OnEnd();}
-            if(mRequestEvent != null) mRequestEvent.OnConnected(Error_Setup,null,GetError());
+            if(mProgress != null) {mProgress.OnEnd(mID);}
+            if(mRequestEvent != null) mRequestEvent.OnConnected(mID,Error_Setup,null,GetError());
             return false;
         }
         return true;
@@ -133,8 +134,8 @@ public class SHttpConnection {
                 if (outStream == null) {
                     SetError("can not send outStream");
                     Log.e("JavaSong",GetError());
-                    if(mProgress != null) {mProgress.OnEnd();}
-                    if(mRequestEvent != null) mRequestEvent.OnConnected(Error_SendData,null,GetError());
+                    if(mProgress != null) {mProgress.OnEnd(mID);}
+                    if(mRequestEvent != null) mRequestEvent.OnConnected(mID,Error_SendData,null,GetError());
                     return false;
                 }
                 outStream.write(btData);
@@ -147,8 +148,8 @@ public class SHttpConnection {
         {
             SetError("SendData " + e.getLocalizedMessage());
             Log.e("JavaSong",GetError());
-            if(mProgress != null) {mProgress.OnEnd();}
-            if(mRequestEvent != null) mRequestEvent.OnConnected(Error_SendData,null,GetError());
+            if(mProgress != null) {mProgress.OnEnd(mID);}
+            if(mRequestEvent != null) mRequestEvent.OnConnected(mID,Error_SendData,null,GetError());
             return false;
         }
         return true;
@@ -166,8 +167,8 @@ public class SHttpConnection {
             if (outStream == null) {
                 SetError("can not send outStream");
                 Log.e("JavaSong",GetError());
-                if(mProgress != null) {mProgress.OnEnd();}
-                if(mRequestEvent != null) mRequestEvent.OnConnected(Error_SendData,null,GetError());
+                if(mProgress != null) {mProgress.OnEnd(mID);}
+                if(mRequestEvent != null) mRequestEvent.OnConnected(mID,Error_SendData,null,GetError());
                 return false;
             }
             byte[] buf = new byte[4096];
@@ -183,8 +184,8 @@ public class SHttpConnection {
         {
             SetError("SendData " + e.getLocalizedMessage());
             Log.e("JavaSong",GetError());
-            if(mProgress != null) {mProgress.OnEnd();}
-            if(mRequestEvent != null) mRequestEvent.OnConnected(Error_SendData,null,GetError());
+            if(mProgress != null) {mProgress.OnEnd(mID);}
+            if(mRequestEvent != null) mRequestEvent.OnConnected(mID,Error_SendData,null,GetError());
             return false;
         }
         return true;
@@ -204,16 +205,16 @@ public class SHttpConnection {
                 default:
                     SetError("Response " + mConn.getResponseMessage());
                     Log.e("JavaSong",GetError());
-                    if(mProgress != null) {mProgress.OnEnd();}
-                    if(mRequestEvent != null) mRequestEvent.OnConnected(nResponse,null,GetError());
+                    if(mProgress != null) {mProgress.OnEnd(mID);}
+                    if(mRequestEvent != null) mRequestEvent.OnConnected(mID,nResponse,null,GetError());
                     return nResponse;
             }
 
-            if(mProgress != null) mProgress.OnTitle("Downloading...");
+            if(mProgress != null) mProgress.OnTitle(mID,"Downloading...");
             String sBufferSize = mConn.getHeaderField("Content-Length");
             if(sBufferSize != null) {
                 mContentSize = Integer.parseInt(sBufferSize);
-                if(mProgress != null) mProgress.OnTotal(mContentSize);
+                if(mProgress != null) mProgress.OnTotal(mID,mContentSize);
             }
             String sContentDispos =  mConn.getHeaderField("Content-Disposition");
             if(sContentDispos != null)
@@ -230,22 +231,22 @@ public class SHttpConnection {
                         mDownFileName = sContentDispos.replaceFirst("(?i)^.*filename = \"([^\"]+)\".*$", "$1");
                 }
             }
-            if(mRequestEvent != null) mRequestEvent.OnConnected(HttpURLConnection.HTTP_OK,mConn.getHeaderFields(),GetError());
+            if(mRequestEvent != null) mRequestEvent.OnConnected(mID,HttpURLConnection.HTTP_OK,mConn.getHeaderFields(),GetError());
         }
         catch (MalformedURLException e)
         {
             SetError("SendData " + e.getLocalizedMessage());
             Log.e("JavaSong",GetError());
-            if(mProgress != null) {mProgress.OnEnd();}
-            if(mRequestEvent != null) mRequestEvent.OnConnected(Error_MalformedURL,null,GetError());
+            if(mProgress != null) {mProgress.OnEnd(mID);}
+            if(mRequestEvent != null) mRequestEvent.OnConnected(mID,Error_MalformedURL,null,GetError());
             return  Error_MalformedURL;
         }
         catch (IOException e)
         {
             SetError("SendData " + e.getLocalizedMessage());
             Log.e("JavaSong",GetError());
-            if(mProgress != null) {mProgress.OnEnd();}
-            if(mRequestEvent != null) mRequestEvent.OnConnected(Error_MalformedURLIO,null,GetError());
+            if(mProgress != null) {mProgress.OnEnd(mID);}
+            if(mRequestEvent != null) mRequestEvent.OnConnected(mID,Error_MalformedURLIO,null,GetError());
             return  Error_MalformedURLIO;
         }
 
@@ -253,8 +254,8 @@ public class SHttpConnection {
         {
             SetError("SendData " + e.getLocalizedMessage());
             Log.e("JavaSong",GetError());
-            if(mProgress != null) {mProgress.OnEnd();}
-            if(mRequestEvent != null) mRequestEvent.OnConnected(Error_MalformedURLOther,null,GetError());
+            if(mProgress != null) {mProgress.OnEnd(mID);}
+            if(mRequestEvent != null) mRequestEvent.OnConnected(mID,Error_MalformedURLOther,null,GetError());
             return  Error_MalformedURLOther;
         }
         return nResponse;
@@ -272,20 +273,20 @@ public class SHttpConnection {
             {
                 byte[] data = new byte[nChunk];
                 System.arraycopy(buf,0,data,0,nChunk);
-                if(mRequestEvent != null) mRequestEvent.OnReceive(data);
-                if(mProgress != null) {mProgress.OnPosition(lPos);lPos+=nChunk;}
+                if(mRequestEvent != null) mRequestEvent.OnReceive(mID,data);
+                if(mProgress != null) {mProgress.OnPosition(mID,lPos);lPos+=nChunk;}
             }
         }
         catch (Exception e)
         {
             SetError("ReceiveData " + e.getLocalizedMessage());
             Log.e("JavaSong",GetError());
-            if(mProgress != null) {mProgress.OnEnd();}
-            if(mRequestEvent != null) mRequestEvent.OnCompleted(GetError());
+            if(mProgress != null) {mProgress.OnEnd(mID);}
+            if(mRequestEvent != null) mRequestEvent.OnCompleted(mID,GetError());
             return  false;
         }
-        if(mProgress != null) {mProgress.OnEnd();}
-        if(mRequestEvent != null) mRequestEvent.OnCompleted(null);
+        if(mProgress != null) {mProgress.OnEnd(mID);}
+        if(mRequestEvent != null) mRequestEvent.OnCompleted(mID,null);
         return true;
     }
 
@@ -297,18 +298,18 @@ public class SHttpConnection {
             for (int nChunk = input.read(buf); nChunk!=-1; nChunk = input.read(buf))
             {
                 ouput.write(buf, 0, nChunk);
-                if(mRequestEvent != null) mRequestEvent.OnReceive(buf);
+                if(mRequestEvent != null) mRequestEvent.OnReceive(mID,buf);
             }
         }
         catch (Exception e)
         {
             SetError("ReceiveData " + e.getLocalizedMessage());
             Log.e("JavaSong",GetError());
-            if(mRequestEvent != null) mRequestEvent.OnCompleted(GetError());
+            if(mRequestEvent != null) mRequestEvent.OnCompleted(mID,GetError());
             return  null;
         }
 
-        if(mRequestEvent != null) mRequestEvent.OnCompleted(null);
+        if(mRequestEvent != null) mRequestEvent.OnCompleted(mID,null);
         return ouput.toByteArray();
     }
 }

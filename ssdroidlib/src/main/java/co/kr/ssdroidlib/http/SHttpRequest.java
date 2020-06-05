@@ -52,38 +52,36 @@ public class SHttpRequest {
     }
 
     public void UploadFile(int ID,String sURL, String sFilePath, Map<String,String> Header,IHttpProgress Progress) {
-        SHttpConnectionMan.RequestHttp(sURL, sFilePath, Header, new SIHttpConnection(ID,null),Progress);
+        SHttpConnectionMan.RequestHttp(sURL, sFilePath, Header, new SIHttpConnection(null),Progress);
     }
 
     private void RequestHttp(int ID,String sURL, byte[] btPost, String sDownloadDir, Map<String,String> Header,IHttpProgress Progress)
     {
-        SHttpConnectionMan.RequestHttp(sURL, btPost, Header, new SIHttpConnection(ID,sDownloadDir),Progress);
+        SHttpConnectionMan.RequestHttp(sURL, btPost, Header, new SIHttpConnection(sDownloadDir),Progress);
     }
 
     class SIHttpConnection implements IHttpConnection
     {
-        protected  int   mID;
         protected  String   mDownloadDir;
-
         ByteArrayOutputStream mBuffer;
         OutputStream mFile;
         Map<String, List<String>> mHeader;
         int mCode;
         String mFilePath = null;
 
-        public SIHttpConnection(int id,String DownloadDir)
+        public SIHttpConnection(String DownloadDir)
         {
-            mID = id;
             mDownloadDir = DownloadDir;
         }
+
         @Override
-        public void OnConnected(int Code, Map<String, List<String>> Header, String sError) {
+        public void OnConnected(long id,int Code, Map<String, List<String>> Header, String sError) {
             mHeader = Header;
             mCode = Code;
 
             if(sError != null) {
                 Message message = mHandler.obtainMessage();
-                message.what = mID;
+                message.what = (int)id;
                 Bundle b = new Bundle();
                 b.putLong("code", Code);
                 b.putString("error", sError);
@@ -93,7 +91,7 @@ public class SHttpRequest {
         }
 
         @Override
-        public void OnReceive(byte[] btData) {
+        public void OnReceive(long id,byte[] btData) {
             try {
                 if(mDownloadDir != null)
                 {
@@ -117,7 +115,7 @@ public class SHttpRequest {
                                 }
                             }
                             if (sFileName == null) {
-                                sFileName = Integer.toString(mID);
+                                sFileName = Integer.toString((int)id);
                                 Log.d("JavaSong", "Not Found Filename");
                             }
                             mFile = new FileOutputStream(mDownloadDir + "/" + sFileName);
@@ -145,7 +143,7 @@ public class SHttpRequest {
         }
 
         @Override
-        public void OnCompleted(String sError) {
+        public void OnCompleted(long id,String sError) {
             if(mFile != null) {
                 try {
                     mFile.close();
@@ -155,7 +153,7 @@ public class SHttpRequest {
             }
 
             Message message = mHandler.obtainMessage();
-            message.what = mID;
+            message.what = (int)id;
             message.obj = mHeader;
             Bundle b = new Bundle();
             b.putLong("code", mCode);
