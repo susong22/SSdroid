@@ -23,6 +23,7 @@ import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -147,6 +148,14 @@ public class SWebView extends WebView {
             { WebView.setWebContentsDebuggingEnabled(true); }
         }
 
+        //------------------------
+        //file:// 이미지를 읽어온다. //Not allowed to load local resource   이코드를 넣어도 안된다. shouldInterceptRequest 을 확장하여 바꿔치기를 해야 한다.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+        getSettings().setAllowFileAccessFromFileURLs(true);
+        //------------------------
+
         getSettings().setJavaScriptEnabled(true);
 
         // window.ssdroid.postMessage(xxx) 이렇게 자바스크립트를 콜하여 이벤트를 발생시켜준다.
@@ -226,6 +235,17 @@ public class SWebView extends WebView {
 
     class WebViewClientEx extends  WebViewClient
     {
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+            WebResourceResponse response = super.shouldInterceptRequest(view, url);
+            if(mInterface != null)
+            {
+                response = mInterface.shouldInterceptRequest(view,url);
+                if(response != null)
+                    return response;
+            }
+            return response;
+        }
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String Url) {

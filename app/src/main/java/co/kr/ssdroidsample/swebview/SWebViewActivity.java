@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.widget.Toast;
 
@@ -53,8 +54,15 @@ public class SWebViewActivity extends AppCompatActivity implements ISWebView {
     }
 
 
+
+
     //-------------------------------------------
     //Start ISWebView
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+        return null;
+    }
+
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         Log.d("JavaSong","shouldOverrideUrlLoading " + url);
