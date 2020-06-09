@@ -17,6 +17,7 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
@@ -76,6 +77,18 @@ public class SWebView extends WebView {
         super(context,attrs,defStyle);
         mContext = context;
     }
+
+    /**
+     * 중요하다... WebView안쪽에 TouchStart -> Left->Right 할때 TouchCancel로 취소가 되버린다. 아래의 문장을 넣어주어야
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        requestDisallowInterceptTouchEvent(true); //웹뷰에서 발생하는 이벤트를 다른 뷰에서 가로채는 것을 막는 역할을 한다.
+        return super.onTouchEvent(event);
+    }
+
 
     public void SetMultiWebView(SMultiWebView v) { mMultiWebView = v;}
 
@@ -148,13 +161,6 @@ public class SWebView extends WebView {
             { WebView.setWebContentsDebuggingEnabled(true); }
         }
 
-        //------------------------
-        //file:// 이미지를 읽어온다. //Not allowed to load local resource   이코드를 넣어도 안된다. shouldInterceptRequest 을 확장하여 바꿔치기를 해야 한다.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        }
-        getSettings().setAllowFileAccessFromFileURLs(true);
-        //------------------------
 
         getSettings().setJavaScriptEnabled(true);
 
