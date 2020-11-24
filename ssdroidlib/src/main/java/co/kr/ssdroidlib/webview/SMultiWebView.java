@@ -91,6 +91,15 @@ public class SMultiWebView extends LinearLayout implements SMultiWebViewTabBar.S
         return mTabBar.GetFocus();
     }
 
+    public long GetTabSize()
+    {
+        return mTabBar.GetTabSize();
+    }
+    public boolean IsFirstTab(long ID)
+    {
+        return mTabBar.IsFirstTab(ID);
+    }
+
     public void loadUrl(String url, Map<String, String> additionalHttpHeaders) {
         long id = GetFocus();
         SWebView webview = mapData.get(id);

@@ -185,7 +185,7 @@ public class SWebView extends WebView {
         // 안뜨게 한다.
 
         //getSettings().setSupportMultipleWindows(true);
-        getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        //getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
 
         getSettings().setDomStorageEnabled(true);
         getSettings().setAllowFileAccess(true);
@@ -290,6 +290,7 @@ public class SWebView extends WebView {
     {
 
         public void onGeolocationPermissionsShowPrompt(String origin, android.webkit.GeolocationPermissions.Callback callback) {
+            super.onGeolocationPermissionsShowPrompt(origin,callback);
             callback.invoke(origin, true, false);
         }
 

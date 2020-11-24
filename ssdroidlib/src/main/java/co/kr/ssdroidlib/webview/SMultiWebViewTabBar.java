@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,12 +70,26 @@ public class SMultiWebViewTabBar extends HorizontalScrollView {
             TabCon.setBackgroundColor(Color.LTGRAY);
             Title.setTextColor(Color.BLACK);
             Title.setTypeface(null, Typeface.BOLD);
+            //Title.setTextSize(TypedValue.COMPLEX_UNIT_DIP,15);
         }
         else {
             TabCon.setBackgroundColor(Color.GRAY);
             Title.setTextColor(Color.WHITE);
             Title.setTypeface(null, Typeface.NORMAL);
+            //Title.setTextSize(TypedValue.COMPLEX_UNIT_DIP,15);
         }
+    }
+
+    public long GetTabSize()
+    {
+        return mapTab.size();
+    }
+    public boolean IsFirstTab(long ID)
+    {
+        View v = mTabBarContent.getChildAt(0);
+        TabData tab = mapTab.get(ID);
+        if(tab != null && tab.TabButtonCon == v) return true;
+        return false;
     }
 
     public long GetFocus()
@@ -167,7 +182,7 @@ public class SMultiWebViewTabBar extends HorizontalScrollView {
         Title.setSingleLine();
         Title.setPadding(SUtils.ToDiplay(mContext,1),0,SUtils.ToDiplay(mContext,1),0);
 
-        Title.setTextSize(18);
+        Title.setTextSize(TypedValue.COMPLEX_UNIT_DIP,13);
         Title.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams TxtParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT);
         TxtParams.setMargins(SUtils.ToDiplay(mContext,1),0,SUtils.ToDiplay(mContext,10),0);

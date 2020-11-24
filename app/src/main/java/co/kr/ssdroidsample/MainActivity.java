@@ -1,21 +1,9 @@
 package co.kr.ssdroidsample;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import co.kr.ssdroidlib.http.SHttpRequest;
-import co.kr.ssdroidlib.page.SViewPager;
-import co.kr.ssdroidsample.R;
-import co.kr.ssdroidsample.shttp.SHttpActivity;
-import co.kr.ssdroidsample.sviewpager.SViewPagerActivity;
-import co.kr.ssdroidsample.swebview.SWebViewActivity;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,13 +11,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
+
+import co.kr.ssdroidsample.shttp.SHttpActivity;
+import co.kr.ssdroidsample.sviewpager.SViewPagerActivity;
+import co.kr.ssdroidsample.swebview.SWebViewActivity;
 
 public class MainActivity extends AppCompatActivity {
 

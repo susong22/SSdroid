@@ -107,8 +107,6 @@ public class SDatabase {
         return rc;
     }
 
-
-
     public long QueryCount(String sSQL){
 
         long count = 0;
