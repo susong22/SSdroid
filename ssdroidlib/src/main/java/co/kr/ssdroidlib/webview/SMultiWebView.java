@@ -15,11 +15,11 @@ import java.util.Map;
 import co.kr.ssdroidlib.comm.SUtils;
 
 public class SMultiWebView extends LinearLayout implements SMultiWebViewTabBar.SMultiWebViewTabBarEvent {
-    Context mContext;
-    SMultiWebViewTabBar  mTabBar;
-    LinearLayout          mTabBarContent;
-    ISWebView mInterface;
-    Map<Long,SWebView> mapData = new HashMap<Long,SWebView>();
+    protected  Context mContext;
+    protected  SMultiWebViewTabBar  mTabBar;
+    protected  LinearLayout          mTabBarContent;
+    protected  ISWebView mInterface;
+    protected  Map<Long,SWebView> mapData = new HashMap<Long,SWebView>();
 
     public SMultiWebView(Context context) {
         super(context);

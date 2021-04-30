@@ -31,10 +31,10 @@ public class SMultiWebViewTabBar extends HorizontalScrollView {
         boolean Focus;
     }
 
-    LinearLayout          mTabBarContent;
-    Context mContext;
-    SMultiWebViewTabBarEvent mEvent;
-    Map<Long,TabData> mapTab = new Hashtable<Long,TabData>();
+    public LinearLayout          mTabBarContent;
+    public Context mContext;
+    public SMultiWebViewTabBarEvent mEvent;
+    public Map<Long,TabData> mapTab = new Hashtable<Long,TabData>();
 
 
     public SMultiWebViewTabBar(Context context) {
@@ -52,7 +52,7 @@ public class SMultiWebViewTabBar extends HorizontalScrollView {
         mEvent = event;
     }
 
-    void Init(Context context)
+    public void Init(Context context)
     {
         mContext = context;
         HorizontalScrollView.LayoutParams TabBarParam = new HorizontalScrollView.LayoutParams(HorizontalScrollView.LayoutParams.MATCH_PARENT, SUtils.ToDiplay(mContext,30));
@@ -64,7 +64,7 @@ public class SMultiWebViewTabBar extends HorizontalScrollView {
         addView(mTabBarContent);
     }
 
-    void SetFocus(View TabCon, TextView Title,boolean bFocus)
+    public void SetFocus(View TabCon, TextView Title,boolean bFocus)
     {
         if(bFocus) {
             TabCon.setBackgroundColor(Color.LTGRAY);
@@ -101,7 +101,7 @@ public class SMultiWebViewTabBar extends HorizontalScrollView {
         return 0;
     }
 
-    void SetFocus(long ID)
+    public void SetFocus(long ID)
     {
         for(Map.Entry<Long,TabData> entry : mapTab.entrySet()) {
             TabData value = entry.getValue();
@@ -126,7 +126,7 @@ public class SMultiWebViewTabBar extends HorizontalScrollView {
         }
     }
 
-    void RemoveTab(long ID)
+    public void RemoveTab(long ID)
     {
         long FocusID = -1;
 
